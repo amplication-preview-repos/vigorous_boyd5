@@ -1,0 +1,77 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Page {
+  components Component[]
+  content    Json?
+  createdAt  DateTime    @default(now())
+  id         String      @id @default(cuid())
+  project    Project?    @relation(fields: [projectId], references: [id])
+  projectId  String?
+  title      String?
+  updatedAt  DateTime    @updatedAt
+}
+
+model Project {
+  createdAt    DateTime      @default(now())
+  createdBy    String?
+  description  String?
+  id           String        @id @default(cuid())
+  integrations Integration[]
+  name         String?
+  pages        Page[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model Component {
+  createdAt DateTime                @default(now())
+  id        String                  @id @default(cuid())
+  page      Page?                   @relation(fields: [pageId], references: [id])
+  pageId    String?
+  settings  Json?
+  typeField EnumComponentTypeField?
+  updatedAt DateTime                @updatedAt
+}
+
+model Integration {
+  createdAt DateTime                  @default(now())
+  id        String                    @id @default(cuid())
+  name      String?
+  project   Project?                  @relation(fields: [projectId], references: [id])
+  projectId String?
+  settings  Json?
+  typeField EnumIntegrationTypeField?
+  updatedAt DateTime                  @updatedAt
+}
+
+model User {
+  createdAt DateTime      @default(now())
+  email     String?       @unique
+  firstName String?
+  id        String        @id @default(cuid())
+  isActive  Boolean?
+  lastName  String?
+  password  String
+  role      EnumUserRole?
+  roles     Json
+  updatedAt DateTime      @updatedAt
+  username  String        @unique
+}
+
+enum EnumComponentTypeField {
+  Option1
+}
+
+enum EnumIntegrationTypeField {
+  Option1
+}
+
+enum EnumUserRole {
+  Option1
+}
